@@ -1,0 +1,640 @@
+<title>Карта бота — HD Massivhaus Assistant</title>
+<style>
+:root {
+  --bg: #eef1f4;
+  --paper: #ffffff;
+  --ink: #17222d;
+  --muted: #56677a;
+  --line: #c7d1db;
+  --line-strong: #90a2b5;
+  --accent: #1f5aa6;
+  --accent-soft: #e4edf9;
+  --tag-bg: #f0ece2;
+  --tag-ink: #7a5b2e;
+  --focus: #1f5aa6;
+  --font-label: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+:root[data-theme="dark"] {
+  --bg: #0c1520;
+  --paper: #101c29;
+  --ink: #e7edf3;
+  --muted: #93a6ba;
+  --line: #24384c;
+  --line-strong: #4d76c9;
+  --accent: #6fa8f0;
+  --accent-soft: #16283c;
+  --tag-bg: #241d12;
+  --tag-ink: #d9b877;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1520;
+    --paper: #101c29;
+    --ink: #e7edf3;
+    --muted: #93a6ba;
+    --line: #24384c;
+    --line-strong: #4d76c9;
+    --accent: #6fa8f0;
+    --accent-soft: #16283c;
+    --tag-bg: #241d12;
+    --tag-ink: #d9b877;
+  }
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.sheet {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 16px 100px;
+}
+.titleblock {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.titleblock h1 {
+  font-family: var(--font-label);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+  color: var(--muted);
+}
+.titleblock .name {
+  font-size: 19px;
+  font-weight: 600;
+  text-wrap: balance;
+}
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.tabgroup {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.lang-tab, .view-tab {
+  font-family: var(--font-label);
+  font-size: 13px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--muted);
+  border-radius: 3px;
+  padding: 8px 12px;
+  min-height: 38px;
+  cursor: pointer;
+}
+.lang-tab.is-active, .view-tab.is-active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.lang-tab:focus-visible, .view-tab:focus-visible, button:focus-visible, .node summary:focus-visible, .info-btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.tagline {
+  margin: 14px 2px 20px;
+  color: var(--muted);
+  max-width: 62ch;
+  line-height: 1.5;
+  white-space: pre-line;
+  font-size: 14px;
+}
+.tree {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 8px 6px 8px 2px;
+}
+.node { position: relative; }
+.node > .row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  list-style: none;
+}
+.node > .row::-webkit-details-marker { display: none; }
+.node > .row:hover { background: var(--accent-soft); }
+.node .label {
+  font-weight: 600;
+  font-size: 14.5px;
+  flex: 1;
+  min-width: 0;
+}
+.node .tag {
+  font-family: var(--font-label);
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: var(--tag-bg);
+  color: var(--tag-ink);
+  border-radius: 2px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+.info-btn {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--accent);
+  font-family: var(--font-label);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.info-btn:hover { background: var(--accent-soft); }
+.children {
+  margin-left: 14px;
+  padding-left: 10px;
+  border-left: 1px dashed var(--line);
+}
+details[open] > .row .chevron { transform: rotate(90deg); }
+.chevron {
+  font-family: var(--font-label);
+  color: var(--muted);
+  transition: transform 0.15s ease;
+  width: 1em;
+  flex: none;
+}
+.leaf-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--line);
+  flex: none;
+  margin: 0 0.4em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chevron { transition: none; }
+}
+
+/* --- Flow (column) view: everything visible at once, no expanding --- */
+.flow {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 20px 18px;
+  overflow-x: auto;
+}
+.flow-hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 14px;
+}
+.flow-root {
+  display: flex;
+  flex-direction: column;
+}
+/* Strong separators between each top-level branch (Agent / Finance / CRM / ...) */
+.flow-root > .fnode {
+  padding: 18px 0;
+}
+.flow-root > .fnode:not(:first-child) {
+  border-top: 2px solid var(--line-strong);
+  margin-top: 4px;
+}
+.fnode {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.fnode-box {
+  position: relative;
+  border: 1px solid var(--line);
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 8px 12px;
+  min-width: 140px;
+  max-width: 220px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font-family: inherit;
+}
+.fnode-box:hover { border-color: var(--accent); }
+/* Top-level = a chapter heading: bigger, accent spine, paper background so it visually leads its whole branch */
+.depth-0 > .fnode-box {
+  font-size: 14.5px;
+  background: var(--paper);
+  border-left: 4px solid var(--accent);
+  padding: 10px 14px;
+  min-width: 168px;
+}
+.fnode-box.has-children::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 22px;
+  height: 1px;
+  background: var(--line-strong);
+}
+.fnode-box .ftag {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--font-label);
+  font-weight: 400;
+  font-size: 9.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--tag-ink);
+}
+.fnode-children {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-left: 22px;
+  border-left: 1.5px solid var(--line-strong);
+}
+.fnode-children > .fnode { position: relative; }
+/* Break between sibling groups that each have their own children (e.g. Expenses'
+   6 items vs. Income's 4) so one group doesn't visually bleed into the next. */
+.fnode-children > .fnode.has-children:not(:first-child) {
+  border-top: 1px dashed var(--line-strong);
+  padding-top: 14px;
+  margin-top: 2px;
+}
+.fnode-children > .fnode::before {
+  content: "";
+  position: absolute;
+  left: -22px;
+  top: 50%;
+  width: 22px;
+  height: 1px;
+  background: var(--line-strong);
+}
+.legend {
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 14px 16px;
+  background: var(--paper);
+}
+.legend h2 {
+  font-family: var(--font-label);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px 20px;
+}
+.legend-item { font-size: 12.5px; line-height: 1.4; }
+.legend-item .ltag {
+  font-family: var(--font-label);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  background: var(--tag-bg);
+  color: var(--tag-ink);
+  border-radius: 2px;
+  padding: 1px 6px;
+  margin-right: 6px;
+}
+footer.meta {
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-family: var(--font-label);
+}
+
+/* --- Info panel: bottom sheet, opens instantly on tap/click, works on touch --- */
+.info-panel {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  max-height: 50vh;
+  overflow-y: auto;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -10px 28px rgba(10, 20, 30, 0.16);
+  padding: 16px 44px 16px 18px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  transform: translateY(105%);
+  transition: transform 0.18s ease;
+  z-index: 40;
+}
+.info-panel.is-open { transform: translateY(0); }
+.info-close {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+}
+.info-close:hover { background: var(--accent-soft); }
+.info-title { font-weight: 700; font-size: 15.5px; }
+.info-tag {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: var(--font-label);
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: var(--tag-bg);
+  color: var(--tag-ink);
+  border-radius: 2px;
+  padding: 2px 7px;
+}
+.info-body {
+  margin-top: 10px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  white-space: pre-line;
+}
+@media (prefers-reduced-motion: reduce) {
+  .info-panel { transition: none; }
+}
+
+@media (max-width: 640px) {
+  .sheet { padding: 14px 10px 90px; }
+  .titleblock { padding: 12px 14px; }
+  .titleblock .name { font-size: 17px; }
+  .tabgroup { width: 100%; }
+  .lang-tab, .view-tab { flex: 1; text-align: center; }
+  .node .label { font-size: 13.5px; }
+  .fnode-box { min-width: 122px; font-size: 11.5px; padding: 7px 9px; }
+  .depth-0 > .fnode-box { font-size: 13px; min-width: 140px; }
+  .fnode-children { padding-left: 16px; }
+  .fnode-children > .fnode::before { left: -16px; width: 16px; }
+  .fnode-box.has-children::after { width: 16px; }
+  .fnode { gap: 16px; }
+  .legend-grid { grid-template-columns: 1fr; }
+}
+</style>
+<div class="sheet">
+  <div class="titleblock">
+    <div>
+<h1 id="page-title"></h1>
+      <div class="name" id="bot-name"></div>
+    </div>
+    <div class="controls">
+      <div class="tabgroup" id="view-tabs">
+        <button class="view-tab is-active" data-view="tree" type="button">☰ Дерево</button>
+        <button class="view-tab" data-view="flow" type="button">⑃ Схема</button>
+      </div>
+      <div class="tabgroup"><button class="lang-tab is-active" data-lang="ru" type="button">🇷🇺 RU</button><button class="lang-tab" data-lang="de" type="button">🇩🇪 DE</button></div>
+    </div>
+  </div>
+  <p class="tagline" id="bot-tagline"></p>
+  <div class="tree" id="tree" role="tree"></div>
+  <div class="flow" id="flow" style="display:none">
+    <p class="flow-hint" id="flow-hint"></p>
+    <div class="flow-root" id="flow-root"></div>
+  </div>
+  <div class="legend">
+    <h2 id="legend-title"></h2>
+    <div class="legend-grid" id="legend-grid"></div>
+  </div>
+  <footer class="meta" id="generated-at"></footer>
+</div>
+<div class="info-panel" id="info-panel" aria-hidden="true">
+  <button class="info-close" id="info-close" type="button" aria-label="Close">✕</button>
+  <div class="info-title" id="info-title"></div>
+  <span class="info-tag" id="info-tag" style="display:none"></span>
+  <div class="info-body" id="info-body"></div>
+</div>
+<script type="application/json" id="data-ru">{"id":"root","label":"HD Massivhaus Assistant","description":"Ассистент для строительной компании: финансы, CRM, задачи, календарь и почта в одном боте.","children":[{"id":"agent","label":"🤖 AI-агент","description":"Понимает свободные вопросы: помогает по финансам, задачам и навигации по боту.","integration":"n8n AI-агент","children":[{"id":"agent-exit","label":"🚪 Выйти из агента","description":"Возвращает в обычное меню сценариев."}]},{"id":"finance","label":"💼 Финансы","description":"Счета, оплаты, инвойсы и финансовый контроль.","children":[{"id":"expenses","label":"💸 Расходы","description":"Данные из sevDesk (расходные документы типа «Voucher»).","integration":"sevDesk","children":[{"id":"payment_summary","label":"📊 Сводка расходов","description":"получить сводку по оплатам без детализации документов.","integration":"sevDesk"},{"id":"invoice_unpaid","label":"⏳ Открытые","description":"посмотреть платежи, которые еще ожидают проведения.","integration":"sevDesk"},{"id":"payment_overdue","label":"🚨 Просроченные","description":"вывести критические и просроченные оплаты.","integration":"sevDesk"},{"id":"payment_partial","label":"🧩 Частично оплаченные","description":"показать частично закрытые оплаты.","integration":"sevDesk"},{"id":"payment_paid","label":"✅ Оплаченные платежи","description":"получить список уже проведенных оплат.","integration":"sevDesk"},{"id":"invoice_entwurf","label":"📝 Черновики","description":"Черновики счетов, ещё не отправленные клиенту.","integration":"sevDesk"}]},{"id":"income","label":"💰 Доходы","description":"Данные из sevDesk (документы поступлений типа «Voucher»).","integration":"sevDesk","children":[{"id":"income_summary","label":"💰 Сводка доходов","description":"Общая сумма поступлений за текущий период.","integration":"sevDesk"},{"id":"income_open","label":"📥 Открытые","description":"Поступления, которые ещё ожидают оплаты от клиента.","integration":"sevDesk"},{"id":"income_overdue","label":"🚨 Просроченные поступления","description":"Поступления с просроченным сроком оплаты.","integration":"sevDesk"},{"id":"income_received","label":"✅ Получены","description":"Поступления, которые уже фактически получены.","integration":"sevDesk"}]}]},{"id":"clients","label":"📈Лиды","description":"Синхронизация CRM и лиды из таблиц.\nОбновления заявок, воронки продаж, новых лидов и статусов сделок.","integration":"Google Sheets","children":[{"id":"leads_1","label":"🏗 Bauprojekt","description":"строительные проекты и объекты.","integration":"Google Sheets"},{"id":"leads_2","label":"📋 Leistungen","description":"запросы на услуги.","integration":"Google Sheets"},{"id":"leads_3","label":"💼 Bewerbung","description":"отклики и кандидаты.","integration":"Google Sheets"},{"id":"leads_4","label":"📇 Kontakt","description":"обращения и контактные формы.","integration":"Google Sheets"},{"id":"crm_add_contacts","label":"📇 Добавить в контакты","description":"Альтернативный режим для кнопок листов выше: вместо текста показывает чекбокс-список лидов — выберите нужных и подтвердите, чтобы добавить их в контакты. Сейчас выключено (переменная LEADS_SELECTION_MODE).","integration":"Google Sheets"}]},{"id":"tasks","label":"📝 Задачи","description":"Google Tasks: свои задачи, задачи коллег и проектные списки.","integration":"Google Tasks","children":[{"id":"tasks_my","label":"📋 Мои задачи","description":"Показывает задачи, назначенные текущему пользователю.","integration":"Google Tasks"},{"id":"tasks_team","label":"👥 Задачи коллег","description":"Каждый настроенный коллега — отдельная кнопка. Нажатие показывает его задачи.","integration":"Google Tasks","children":[{"id":"colleague_0","label":"👤 Lena","description":"Показывает задачи именно этого коллеги."},{"id":"colleague_1","label":"👤 Robert","description":"Показывает задачи именно этого коллеги."},{"id":"colleague_2","label":"👤 Nikolaj","description":"Показывает задачи именно этого коллеги."},{"id":"colleague_3","label":"ℹ️ Info","description":"Показывает задачи именно этого коллеги."}]},{"id":"tasks_projects","label":"📁 Проекты","description":"Каждый настроенный проект — отдельная кнопка. Нажатие показывает его задачи.","integration":"Google Tasks","children":[{"id":"project_none","label":"—","description":"Пока не настроено ни одного проекта (переменная TASKS_PROJECT_LISTS)."}]},{"id":"tasks_actions","label":"✅ Действия со списком задач","description":"Доступно в любом списке задач (свои / коллеги / проект).","integration":"Google Tasks","children":[{"id":"tasks_action_done","label":"✅ Закрыть задачи","description":"Отметьте несколько задач в списке и подтвердите — они закроются в Google Tasks сразу.","integration":"Google Tasks"},{"id":"tasks_action_remind","label":"⏰ Напомнить","description":"Выберите задачи и время — пресетами (через час, завтра утром/вечером) или вручную (день/час/минута) — бот напомнит. Когда напоминание сработает, можно сразу отметить задачу выполненной или отложить (snooze).","integration":"Google Tasks"}]}]},{"id":"calendar","label":"📅 Календарь","description":"Google Calendar: быстрые срезы расписания.","integration":"Google Calendar","children":[{"id":"calendar_today","label":"📅 Сегодня","description":"Список событий в календаре на сегодня.","integration":"Google Calendar"},{"id":"calendar_tomorrow","label":"📆 Завтра","description":"Список событий в календаре на завтра.","integration":"Google Calendar"},{"id":"calendar_week","label":"🗓 7 дней","description":"Обзор событий календаря на ближайшие 7 дней.","integration":"Google Calendar"}]},{"id":"mail","label":"📬 Почта","description":"Новые письма по тендерам, договорам, оплатам и срочным темам.\nКонтроль входящей и исходящей почты, важных писем и писем без ответа.","integration":"Gmail","children":[{"id":"mail_inbox","label":"📥 Входящие","description":"получить сводку по новым письмам.","integration":"Gmail"},{"id":"mail_sent","label":"📤 Исходящие","description":"просмотреть отправленные вами письма.","integration":"Gmail"},{"id":"mail_no_reply","label":"✉️ Без ответа","description":"проверить письма, оставшиеся без ответа.","integration":"Gmail"},{"id":"mail_digest","label":"📬 Дайджест","description":"AI-дайджест: письма по категориям — нужен ответ / к сведению / рассылки.","integration":"Gmail"},{"id":"mail_actions","label":"✉️ Действия с письмом","description":"Доступно при открытии конкретного письма из Входящих/Дайджеста/Без ответа. У Исходящих доступны только «→ Задача» и переключатель Резюме/Текст.","children":[{"id":"mail_action_task","label":"📋 → Задача","description":"Создаёт задачу в Google Tasks из этого письма — себе, конкретному коллеге или в проект.","integration":"Google Tasks"},{"id":"mail_action_reply","label":"✍️ Ответить","description":"AI готовит черновик ответа: можно сразу отправить, перегенерировать, дописать свой текст или попросить AI переписать по теме.","integration":"Gmail"},{"id":"mail_action_calendar","label":"📅 Событие в календарь","description":"AI находит дату и время в письме и предлагает создать событие в Google Calendar.","integration":"Google Calendar"},{"id":"mail_action_dismiss","label":"✓ Решено — убрать из дайджеста","description":"Помечает письмо как обработанное и убирает его из дайджеста.","integration":"Gmail"},{"id":"mail_action_toggle","label":"📄 Полный текст / 💬 Резюме","description":"Переключает показ письма между полным текстом и коротким AI-резюме — без нового сообщения.","integration":"Gmail"},{"id":"mail_action_detail","label":"🤖 Детально","description":"Отдельным сообщением генерирует более глубокий AI-разбор именно этого письма — это не то же самое, что короткое резюме выше.","integration":"Gmail"}]}]}]}</script>
+<script type="application/json" id="data-de">{"id":"root","label":"HD Massivhaus Assistant","description":"Assistent für ein Bauunternehmen: Finanzen, CRM, Aufgaben, Kalender und E-Mail in einem Bot.","children":[{"id":"agent","label":"🤖 KI-Agent","description":"Versteht frei formulierte Fragen: hilft bei Finanzen, Aufgaben und der Navigation im Bot.","integration":"n8n AI-агент","children":[{"id":"agent-exit","label":"🚪 Agent beenden","description":"Kehrt zum normalen Szenario-Menü zurück."}]},{"id":"finance","label":"💼 Finanzen","description":"Rechnungen, Zahlungen, Rechnungsstatus und Finanzkontrolle.","children":[{"id":"expenses","label":"💸 Ausgaben","description":"Daten aus sevDesk (Belege vom Typ „Voucher“, Ausgaben).","integration":"sevDesk","children":[{"id":"payment_summary","label":"📊 Ausgaben-Übersicht","description":"eine Finanzübersicht der Zahlungen ohne Dokumentdetails erhalten.","integration":"sevDesk"},{"id":"invoice_unpaid","label":"⏳ Offen","description":"Zahlungen anzeigen, die noch ausstehen.","integration":"sevDesk"},{"id":"payment_overdue","label":"🚨 Überfällige","description":"kritische und überfällige Zahlungen anzeigen.","integration":"sevDesk"},{"id":"payment_partial","label":"🧩 Teilweise bezahlt","description":"teilweise abgeschlossene Zahlungen anzeigen.","integration":"sevDesk"},{"id":"payment_paid","label":"✅ Bezahlte Zahlungen","description":"die Liste bereits verbuchter Zahlungen abrufen.","integration":"sevDesk"},{"id":"invoice_entwurf","label":"📝 Entwurf","description":"Rechnungsentwürfe, die noch nicht an den Kunden gesendet wurden.","integration":"sevDesk"}]},{"id":"income","label":"💰 Einnahmen","description":"Daten aus sevDesk (Belege vom Typ „Voucher“, Einnahmen).","integration":"sevDesk","children":[{"id":"income_summary","label":"💰 Einnahmen-Übersicht","description":"Gesamtsumme der Einnahmen im aktuellen Zeitraum.","integration":"sevDesk"},{"id":"income_open","label":"📥 Offen","description":"Einnahmen, die noch auf die Zahlung des Kunden warten.","integration":"sevDesk"},{"id":"income_overdue","label":"🚨 Überfällige Einnahmen","description":"Einnahmen mit überschrittener Zahlungsfrist.","integration":"sevDesk"},{"id":"income_received","label":"✅ Eingegangen","description":"Einnahmen, die bereits tatsächlich eingegangen sind.","integration":"sevDesk"}]}]},{"id":"clients","label":"📈 Leads","description":"CRM-Synchronisierung und Leads aus Tabellen.\nUpdates zu Anfragen, Vertriebspipeline, neuen Leads und Deal-Status.","integration":"Google Sheets","children":[{"id":"leads_1","label":"🏗 Bauprojekt","description":"Bauprojekte und Objekte.","integration":"Google Sheets"},{"id":"leads_2","label":"📋 Leistungen","description":"Leistungsanfragen.","integration":"Google Sheets"},{"id":"leads_3","label":"💼 Bewerbung","description":"Bewerbungen und Kandidaten.","integration":"Google Sheets"},{"id":"leads_4","label":"📇 Kontakt","description":"Kontaktanfragen und Nachrichten.","integration":"Google Sheets"},{"id":"crm_add_contacts","label":"📇 Zu Kontakten hinzufügen","description":"Alternativer Modus für die Blatt-Schaltflächen oben: zeigt statt Text eine Checkbox-Liste der Leads — die gewünschten auswählen und bestätigen, um sie zu Kontakten hinzuzufügen. Aktuell deaktiviert (Variable LEADS_SELECTION_MODE).","integration":"Google Sheets"}]},{"id":"tasks","label":"📝 Aufgaben","description":"Google Tasks: eigene Aufgaben, Aufgaben von Kollegen und Projektlisten.","integration":"Google Tasks","children":[{"id":"tasks_my","label":"📋 Meine Aufgaben","description":"Zeigt die dem aktuellen Benutzer zugewiesenen Aufgaben.","integration":"Google Tasks"},{"id":"tasks_team","label":"👥 Team-Aufgaben","description":"Jeder konfigurierte Kollege ist eine eigene Schaltfläche. Ein Tap zeigt seine Aufgaben.","integration":"Google Tasks","children":[{"id":"colleague_0","label":"👤 Lena","description":"Zeigt die Aufgaben genau dieses Kollegen."},{"id":"colleague_1","label":"👤 Robert","description":"Zeigt die Aufgaben genau dieses Kollegen."},{"id":"colleague_2","label":"👤 Nikolaj","description":"Zeigt die Aufgaben genau dieses Kollegen."},{"id":"colleague_3","label":"ℹ️ Info","description":"Zeigt die Aufgaben genau dieses Kollegen."}]},{"id":"tasks_projects","label":"📁 Projekte","description":"Jedes konfigurierte Projekt ist eine eigene Schaltfläche. Ein Tap zeigt seine Aufgaben.","integration":"Google Tasks","children":[{"id":"project_none","label":"—","description":"Es sind noch keine Projekte konfiguriert (Variable TASKS_PROJECT_LISTS)."}]},{"id":"tasks_actions","label":"✅ Aktionen mit der Aufgabenliste","description":"Verfügbar in jeder Aufgabenliste (eigene / Kollegen / Projekt).","integration":"Google Tasks","children":[{"id":"tasks_action_done","label":"✅ Aufgaben schließen","description":"Mehrere Aufgaben in der Liste markieren und bestätigen — sie werden in Google Tasks sofort abgeschlossen.","integration":"Google Tasks"},{"id":"tasks_action_remind","label":"⏰ Erinnern","description":"Aufgaben und Zeitpunkt wählen — per Preset (in 1 Std., morgen früh/abend) oder manuell (Tag/Stunde/Minute) — der Bot erinnert. Wenn die Erinnerung kommt, kann man die Aufgabe sofort abschließen oder verschieben (Snooze).","integration":"Google Tasks"}]}]},{"id":"calendar","label":"📅 Kalender","description":"Google Calendar: schnelle Übersicht des Kalenders.","integration":"Google Calendar","children":[{"id":"calendar_today","label":"📅 Heute","description":"Liste der heutigen Kalendertermine.","integration":"Google Calendar"},{"id":"calendar_tomorrow","label":"📆 Morgen","description":"Liste der morgigen Kalendertermine.","integration":"Google Calendar"},{"id":"calendar_week","label":"🗓 7 Tage","description":"Überblick über Kalendertermine der nächsten 7 Tage.","integration":"Google Calendar"}]},{"id":"mail","label":"📬 E-Mails","description":"Neue E-Mails zu Ausschreibungen, Verträgen, Zahlungen und dringenden Themen.\nKontrolle der ein- und ausgehenden E-Mails, wichtigen Nachrichten und unbeantworteten Mails.","integration":"Gmail","children":[{"id":"mail_inbox","label":"📥 Eingang","description":"eine Übersicht über neue E-Mails erhalten.","integration":"Gmail"},{"id":"mail_sent","label":"📤 Gesendet","description":"Ihre gesendeten E-Mails ansehen.","integration":"Gmail"},{"id":"mail_no_reply","label":"✉️ Ohne Antwort","description":"E-Mails prüfen, die unbeantwortet geblieben sind.","integration":"Gmail"},{"id":"mail_digest","label":"📬 Digest","description":"AI-Digest: E-Mails nach Kategorien — Antwort nötig / zur Kenntnis / Werbung.","integration":"Gmail"},{"id":"mail_actions","label":"✉️ Aktionen mit einer E-Mail","description":"Verfügbar beim Öffnen einer konkreten E-Mail aus Eingang/Übersicht/Unbeantwortet. Bei Gesendet nur „→ Aufgabe“ und der Umschalter Zusammenfassung/Text.","children":[{"id":"mail_action_task","label":"📋 → Aufgabe","description":"Erstellt eine Google-Tasks-Aufgabe aus dieser E-Mail — für sich selbst, einen Kollegen oder ein Projekt.","integration":"Google Tasks"},{"id":"mail_action_reply","label":"✍️ Antworten","description":"Die KI erstellt einen Antwortentwurf: direkt senden, neu generieren, eigenen Text schreiben oder die KI zu einem Thema neu formulieren lassen.","integration":"Gmail"},{"id":"mail_action_calendar","label":"📅 Termin anlegen","description":"Die KI erkennt Datum und Uhrzeit in der E-Mail und schlägt vor, einen Termin im Google Calendar anzulegen.","integration":"Google Calendar"},{"id":"mail_action_dismiss","label":"✓ Erledigt — aus Übersicht entfernen","description":"Markiert die E-Mail als erledigt und entfernt sie aus der Übersicht.","integration":"Gmail"},{"id":"mail_action_toggle","label":"📄 Volltext / 💬 Zusammenfassung","description":"Wechselt die Anzeige der E-Mail zwischen Volltext und kurzer KI-Zusammenfassung — ohne neue Nachricht.","integration":"Gmail"},{"id":"mail_action_detail","label":"🤖 Detailliert","description":"Erzeugt als separate Nachricht eine ausführlichere KI-Analyse genau dieser E-Mail — nicht dasselbe wie die kurze Zusammenfassung oben.","integration":"Gmail"}]}]}]}</script>
+<script type="application/json" id="legend-data">{"entries":[{"tag":"sevDesk","text":{"uk":"Бухгалтерська система, звідки бот бере рахунки, оплати й доходи.","de":"Buchhaltungssystem, aus dem der Bot Rechnungen, Zahlungen und Einnahmen bezieht.","en":"Accounting system the bot pulls invoices, payments, and income from.","ru":"Бухгалтерская система, откуда бот берёт счета, оплаты и доходы."}},{"tag":"Google Sheets","text":{"uk":"Таблиця Google, куди потрапляють заявки/ліди з сайту або форм.","de":"Google-Tabelle, in die Leads/Anfragen von der Website oder aus Formularen einlaufen.","en":"Google Sheet where leads/requests from the website or forms land.","ru":"Таблица Google, куда попадают заявки/лиды с сайта или форм."}},{"tag":"Google Tasks","text":{"uk":"Спільний список задач Google для команди.","de":"Gemeinsame Google-Aufgabenliste für das Team.","en":"Shared Google Tasks list for the team.","ru":"Общий список задач Google для команды."}},{"tag":"Google Calendar","text":{"uk":"Календар Google компанії.","de":"Google-Kalender des Unternehmens.","en":"The company's Google Calendar.","ru":"Google-календарь компании."}},{"tag":"Gmail","text":{"uk":"Поштова скринька компанії (бот тільки читає листи).","de":"Firmen-Postfach (der Bot liest E-Mails nur, ohne sie zu verändern).","en":"The company mailbox (the bot only reads mail, never modifies it).","ru":"Почтовый ящик компании (бот только читает письма)."}},{"tag":"n8n AI-агент","text":{"uk":"Сценарій автоматизації n8n + AI: розуміє вільні запитання, а не лише кнопки.","de":"n8n + KI-Automatisierung: versteht freie Fragen, nicht nur Schaltflächen.","en":"n8n + AI automation: understands free-form questions, not just button taps.","ru":"Сценарий автоматизации n8n + AI: понимает свободные вопросы, а не только кнопки."}}],"title":{"uk":"Що означають підписи","de":"Was die Tags bedeuten","en":"What the tags mean","ru":"Что означают подписи"},"containsLabel":{"uk":"Всередині:","de":"Enthält:","en":"Contains:","ru":"Внутри:"},"tapHint":{"uk":"Натисніть кнопку, щоб побачити опис","de":"Auf eine Schaltfläche tippen, um die Beschreibung zu sehen","en":"Tap a button to see its description","ru":"Нажмите на кнопку, чтобы увидеть описание"},"pageTitle":{"uk":"Карта навігації бота","de":"Bot-Navigationskarte","en":"Bot navigation map","ru":"Карта навигации бота"}}</script>
+<script>
+(function () {
+  var state = { lang: "ru", view: "tree" };
+
+  function legend() { return JSON.parse(document.getElementById("legend-data").textContent); }
+  function legendText(tag) {
+    var entry = legend().entries.find(function (e) { return e.tag === tag; });
+    return entry ? entry.text[state.lang] : "";
+  }
+
+  function formatDescription(text) {
+    // "label — A / B / C." reads better as a short bulleted breakdown.
+    return text.split("\n").map(function (line) {
+      var dashIdx = line.lastIndexOf(" — ");
+      if (dashIdx === -1) return line;
+      var head = line.slice(0, dashIdx + 3);
+      var tail = line.slice(dashIdx + 3);
+      if (tail.indexOf(" / ") === -1) return line;
+      var items = tail.split(" / ").map(function (s) { return s.trim().replace(/\.$/, ""); });
+      return head.slice(0, dashIdx) + "\n" + items.map(function (i) { return "  • " + i; }).join("\n");
+    }).join("\n");
+  }
+
+  function openInfo(node) {
+    document.getElementById("info-title").textContent = node.label;
+    var tagEl = document.getElementById("info-tag");
+    if (node.integration) {
+      tagEl.style.display = "";
+      tagEl.textContent = node.integration;
+    } else {
+      tagEl.style.display = "none";
+    }
+    var parts = [];
+    if (node.description) parts.push(formatDescription(node.description));
+    if (node.integration) parts.push("[" + node.integration + "] " + legendText(node.integration));
+    if (node.children && node.children.length) {
+      parts.push(legend().containsLabel[state.lang] + " " + node.children.map(function (c) { return c.label; }).join(", "));
+    }
+    document.getElementById("info-body").textContent = parts.join("\n\n");
+    document.getElementById("info-panel").classList.add("is-open");
+    document.getElementById("info-panel").setAttribute("aria-hidden", "false");
+  }
+
+  function closeInfo() {
+    document.getElementById("info-panel").classList.remove("is-open");
+    document.getElementById("info-panel").setAttribute("aria-hidden", "true");
+  }
+
+  document.getElementById("info-close").addEventListener("click", closeInfo);
+
+  function renderTreeNode(node, depth) {
+    var hasChildren = node.children && node.children.length > 0;
+    var wrap = document.createElement(hasChildren ? "details" : "div");
+    wrap.className = "node";
+    // Fully expanded by default so the tree shows everything up front, same as the flow view.
+    if (hasChildren) wrap.open = true;
+
+    var row = document.createElement(hasChildren ? "summary" : "div");
+    row.className = "row";
+    if (!hasChildren) row.setAttribute("tabindex", "0");
+
+    if (hasChildren) {
+      var chevron = document.createElement("span");
+      chevron.className = "chevron";
+      chevron.textContent = "▸";
+      row.appendChild(chevron);
+    } else if (depth > 0) {
+      var dot = document.createElement("span");
+      dot.className = "leaf-dot";
+      row.appendChild(dot);
+    }
+
+    var label = document.createElement("span");
+    label.className = "label";
+    label.textContent = node.label;
+    row.appendChild(label);
+
+    if (node.integration) {
+      var tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = node.integration;
+      row.appendChild(tag);
+    }
+
+    var infoBtn = document.createElement("button");
+    infoBtn.type = "button";
+    infoBtn.className = "info-btn";
+    infoBtn.textContent = "i";
+    infoBtn.setAttribute("aria-label", "info");
+    infoBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      openInfo(node);
+    });
+    row.appendChild(infoBtn);
+
+    wrap.appendChild(row);
+
+    if (hasChildren) {
+      var childrenWrap = document.createElement("div");
+      childrenWrap.className = "children";
+      node.children.forEach(function (child) {
+        childrenWrap.appendChild(renderTreeNode(child, depth + 1));
+      });
+      wrap.appendChild(childrenWrap);
+    }
+
+    return wrap;
+  }
+
+  function renderFlowNode(node, depth) {
+    var hasChildren = node.children && node.children.length > 0;
+    var fnode = document.createElement("div");
+    fnode.className = "fnode depth-" + depth + (hasChildren ? " has-children" : "");
+
+    var box = document.createElement("button");
+    box.type = "button";
+    box.className = "fnode-box" + (hasChildren ? " has-children" : "");
+    box.textContent = node.label;
+    box.addEventListener("click", function () { openInfo(node); });
+    if (node.integration) {
+      var ftag = document.createElement("span");
+      ftag.className = "ftag";
+      ftag.textContent = node.integration;
+      box.appendChild(ftag);
+    }
+    fnode.appendChild(box);
+
+    if (hasChildren) {
+      var childrenWrap = document.createElement("div");
+      childrenWrap.className = "fnode-children";
+      node.children.forEach(function (child) {
+        childrenWrap.appendChild(renderFlowNode(child, depth + 1));
+      });
+      fnode.appendChild(childrenWrap);
+    }
+
+    return fnode;
+  }
+
+  function renderLegend() {
+    var data = legend();
+    document.getElementById("legend-title").textContent = data.title[state.lang];
+    document.getElementById("page-title").textContent = data.pageTitle[state.lang];
+    var grid = document.getElementById("legend-grid");
+    grid.innerHTML = "";
+    data.entries.forEach(function (entry) {
+      var item = document.createElement("div");
+      item.className = "legend-item";
+      var tag = document.createElement("span");
+      tag.className = "ltag";
+      tag.textContent = entry.tag;
+      item.appendChild(tag);
+      item.appendChild(document.createTextNode(entry.text[state.lang]));
+      grid.appendChild(item);
+    });
+    document.getElementById("flow-hint").textContent = data.tapHint[state.lang];
+  }
+
+  function render() {
+    closeInfo();
+    var raw = document.getElementById("data-" + state.lang).textContent;
+    var data = JSON.parse(raw);
+    document.getElementById("bot-name").textContent = data.label;
+    document.getElementById("bot-tagline").textContent = data.description || "";
+
+    var tree = document.getElementById("tree");
+    tree.innerHTML = "";
+    data.children.forEach(function (child) {
+      tree.appendChild(renderTreeNode(child, 0));
+    });
+
+    var flowRoot = document.getElementById("flow-root");
+    flowRoot.innerHTML = "";
+    data.children.forEach(function (child) {
+      flowRoot.appendChild(renderFlowNode(child, 0));
+    });
+
+    renderLegend();
+  }
+
+  document.querySelectorAll(".lang-tab").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".lang-tab").forEach(function (b) { b.classList.remove("is-active"); });
+      btn.classList.add("is-active");
+      state.lang = btn.getAttribute("data-lang");
+      render();
+    });
+  });
+
+  document.querySelectorAll(".view-tab").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".view-tab").forEach(function (b) { b.classList.remove("is-active"); });
+      btn.classList.add("is-active");
+      state.view = btn.getAttribute("data-view");
+      document.getElementById("tree").style.display = state.view === "tree" ? "" : "none";
+      document.getElementById("flow").style.display = state.view === "flow" ? "" : "none";
+    });
+  });
+
+  document.getElementById("generated-at").textContent = "generated " + "2026-07-04" + " · npm run bot-map";
+
+  render();
+})();
+</script>
